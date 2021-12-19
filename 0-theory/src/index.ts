@@ -1,77 +1,39 @@
-import { interval, Observable, Subscriber, take, tap, pipe } from 'rxjs';
+import '../../assets/css/style.css';
+import { concatMap, fromEvent } from 'rxjs';
+import { ajax } from 'rxjs/ajax';
 
-// function doNothing<T>(source: Observable<T>) {
-// 	return source;
-// }
+// const sequence$ = interval(2000).pipe(
+// 	map((v) => {
+// 		return of(v * 2);
+// 	}),
+// );
 //
-// function toText<T>(_source: Observable<T>) {
-// 	return new Observable((subscriber) => {
-// 		subscriber.next('myText');
-// 		subscriber.complete();
+// sequence$.subscribe((v) => {
+// 	v.subscribe((z) => {
+// 		console.log(z);
 // 	});
-// }
+// });
 
-/*const pipe = (...fns: Function[]) => {
-	return (source: Observable<any>) => {
-		return fns.reduce((s, fn) => fn(s), source);
-	};
-};*/
+const inputEl = document.querySelector('input') as HTMLInputElement;
 
-class DoubleSubscriber extends Subscriber<number> {
-	public override next(value: number) {
-		super.next(value * 2);
-	}
-}
-
-const double = (source: Observable<number>) => {
-	return new Observable((subscriber) => {
-		const sub = source.subscribe(new DoubleSubscriber(subscriber));
-		// const sub = source.subscribe({
-		// 	next: (v: number) => {
-		// 		console.log('source');
-		// 		subscriber.next(v * 2);
-		// 	},
-		// 	error: (err) => {
-		// 		subscriber.error(err);
-		// 	},
-		// 	complete: () => {
-		// 		subscriber.complete();
-		// 	},
-		// });
-		return () => {
-			sub.unsubscribe();
-		};
-	});
-};
-
-// const double = (source: Observable<number>) => {
-// 	const o$ = new Observable();
-// 	o$.source = source;
-// 	o$.operator = {
-// 		call(subscriber, s) {
-// 			s.subscribe(new DoubleSubscriber(subscriber));
-// 		},
-// 	};
-// 	return o$;
-// };
-
-// const double = (source: Observable<number>) => {
-// 	return source.lift({
-// 		call(subscriber, s) {
-// 			s.subscribe(new DoubleSubscriber(subscriber));
-// 		},
-// 	});
-// };
-
-const doubleTap4 = pipe(
-	double,
-	tap(() => console.log('SIDE EFFECT')),
-	take(4),
-);
-
-interval(1000)
-	.pipe(doubleTap4)
+fromEvent(inputEl, 'input')
+	.pipe(
+		concatMap((event) => {
+			const { value } = event.target as HTMLInputElement;
+			console.log(value);
+			return ajax({
+				url: `http://learn.javascript.ru/courses/groups/api/participants?key=mc4n38&text=${value}`,
+				method: 'GET',
+				crossDomain: true,
+			});
+		}),
+		//concatAll(),
+		// mergeAll(2)
+		// map+ switchAll = switchMap
+		// map+ exhaustAll = exhaustMap
+		// map+ mergeAll = mergeMap
+		// map+ concatAll = concatMap = mergeMap(1)
+	)
 	.subscribe((v) => {
 		console.log(v);
 	});
-// -------1-1-1-1------1-1-1-1-----1-1-1-1
