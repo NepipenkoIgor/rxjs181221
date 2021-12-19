@@ -11,11 +11,11 @@ import { interval, Observable, Subscriber, take, tap, pipe } from 'rxjs';
 // 	});
 // }
 
-/*const pipe = (...fns: Function[]) => {
+/* const pipe = (...fns: Function[]) => {
 	return (source: Observable<any>) => {
 		return fns.reduce((s, fn) => fn(s), source);
 	};
-};*/
+}; */
 
 class DoubleSubscriber extends Subscriber<number> {
 	public override next(value: number) {

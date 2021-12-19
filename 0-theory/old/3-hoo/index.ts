@@ -27,7 +27,7 @@ fromEvent(inputEl, 'input')
 				crossDomain: true,
 			});
 		}),
-		//concatAll(),
+		// concatAll(),
 		// mergeAll(2)
 		// map+ switchAll = switchMap
 		// map+ exhaustAll = exhaustMap

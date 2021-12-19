@@ -1,8 +1,8 @@
 import '../../assets/css/style.css';
 import { terminalLog } from '../../utils/log-in-terminal';
+import { swipe$ } from './swipe';
 
 terminalLog('Swipe');
-import { swipe$ } from './swipe';
 
 swipe$.subscribe((v) => {
 	if (v > 0) {
