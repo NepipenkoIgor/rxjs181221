@@ -1,8 +1,10 @@
 import {
 	bufferCount,
+	catchError,
 	concatMap,
 	debounceTime,
 	distinctUntilChanged,
+	EMPTY,
 	filter,
 	map,
 	Observable,
@@ -67,5 +69,14 @@ export function request(source$: Observable<AjaxResponse<{ items: IRepository[] 
 		// 	return resultStr + createRow(htmlStrs);
 		// }, ''),
 		map((htmlStr: string) => htmlStr.trim().replace(/\s+(<)/g, '<')),
+		// catchError(() => {
+		// 	return of([]);
+		// }),
+		// tap(() => {
+		// 	// detectChanges
+		// }),
+		catchError(() => {
+			return EMPTY;
+		}),
 	);
 }

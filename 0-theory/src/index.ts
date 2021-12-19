@@ -1,39 +1,73 @@
 import '../../assets/css/style.css';
-import { concatMap, fromEvent } from 'rxjs';
-import { ajax } from 'rxjs/ajax';
+import { catchError, EMPTY, interval, map, of, switchMap, zip } from 'rxjs';
 
-// const sequence$ = interval(2000).pipe(
-// 	map((v) => {
-// 		return of(v * 2);
+const sequence1$ = interval(1000);
+const sequence2$ = of('1', '2', '3', 4, '5', '6', '7');
+const sequence$ = zip(sequence1$, sequence2$);
+// const dataSequence$ = sequence$.pipe(
+// 	// map(([, y]) => {
+// 	// 	try {
+// 	// 		return (y as any).toUpperCase(y);
+// 	// 	} catch (err) {
+// 	// 		console.log(err);
+// 	// 		return '100';
+// 	// 	}
+// 	// }),
+// 	switchMap(([, y]) => {
+// 		return of(y).pipe(
+// 			map((x) => {
+// 				return (x as any).toUpperCase(x);
+// 			}),
+// 			// catchError((err) => {
+// 			// 	console.log(err);
+// 			// 	return EMPTY;
+// 			// }),
+// 			// catchError(() => {
+// 			// 	return throwError(() => new Error('Custom Err'));
+// 			// }),
+// 			map((data) => ({ data, error: null })),
+// 			catchError((e) => {
+// 				return of({ data: null, error: 'Custom error' }); // throwError(() => new Error('Custom Err'));
+// 			}),
+// 		);
 // 	}),
+// 	// map(([, y]) => {
+// 	// 	return (y as any).toUpperCase(y);
+// 	// }),
+// 	// retry(3),
+// 	// retryWhen((errObs) => errObs.pipe(delay(3000))),
+// 	// catchError((err) => {
+// 	// 	console.log(err);
+// 	// 	return EMPTY;
+// 	// }),
 // );
 //
-// sequence$.subscribe((v) => {
-// 	v.subscribe((z) => {
-// 		console.log(z);
-// 	});
-// });
+// const errors$ = dataSequence$.pipe(
+// 	filter(({ error }) => Boolean(error)),
+// 	tap(() => {}),
+// );
 
-const inputEl = document.querySelector('input') as HTMLInputElement;
+const dataSequence$ = sequence$.pipe(
+	switchMap(([, y]) => {
+		return of(y).pipe(
+			map((x) => {
+				return (x as any).toUpperCase(x);
+			}),
+			catchError(() => {
+				return EMPTY; // throwError(() => new Error('Custom Err'));
+			}),
+		);
+	}),
+);
 
-fromEvent(inputEl, 'input')
-	.pipe(
-		concatMap((event) => {
-			const { value } = event.target as HTMLInputElement;
-			console.log(value);
-			return ajax({
-				url: `http://learn.javascript.ru/courses/groups/api/participants?key=mc4n38&text=${value}`,
-				method: 'GET',
-				crossDomain: true,
-			});
-		}),
-		//concatAll(),
-		// mergeAll(2)
-		// map+ switchAll = switchMap
-		// map+ exhaustAll = exhaustMap
-		// map+ mergeAll = mergeMap
-		// map+ concatAll = concatMap = mergeMap(1)
-	)
-	.subscribe((v) => {
+dataSequence$.subscribe({
+	next: (v) => {
 		console.log(v);
-	});
+	},
+	error: (err) => {
+		console.log(err);
+	},
+	complete: () => {
+		console.log('completed');
+	},
+});
